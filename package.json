@@ -9,6 +9,9 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "gojs": "^2.2.14",
+    "gojs-react": "^1.1.1",
+    "primeflex": "^3.2.1",
     "primeicons": "^5.0.0",
     "primereact": "^8.5.0",
     "react": "^18.2.0",
