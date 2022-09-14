@@ -3,7 +3,13 @@ export interface Petri{
     description: string,
     places: Place[],
     tokens: Token[],
+    inputs: Input[],
     transitions: Transition[]
+}
+
+export interface Input{
+    transition: Transition,
+    places: Place[]
 }
 
 export interface Place{

@@ -4,7 +4,8 @@ import {TabPanel, TabView} from "primereact/tabview";
 import {ScrollPanel} from "primereact/scrollpanel";
 import {useState} from "react";
 import {ReactDiagram, ReactPalette} from "gojs-react";
-import {generateDiagramStructure, generatePalette} from "./GenerateDiagramStructure";
+import {generateDiagramStructure, generatePalette, showLinkLabel} from "./GenerateDiagramStructure";
+import * as go from "gojs";
 
 interface DrawPetriModalProps {
     displayBasic: boolean
@@ -15,7 +16,7 @@ export const DrawPetriModal = ({displayBasic, setDisplayBasic}: DrawPetriModalPr
 
     const [activeIndex, setActiveIndex] = useState(0);
 
-    const onHide = (name: string) => {
+    const onHide = () => {
         setDisplayBasic(false)
     }
 
@@ -36,8 +37,31 @@ export const DrawPetriModal = ({displayBasic, setDisplayBasic}: DrawPetriModalPr
         }
     )
 
+    const $ = go.GraphObject.make;
+    const diagram =
+        $(go.Diagram,
+            {
+                initialContentAlignment: go.Spot.Center,
+                allowDrop: true,
+                'undoManager.isEnabled': true,  // must be set to allow for model change listening
+                // 'undoManager.maxHistoryLength': 0,  // uncomment disable undo/redo functionality
+                "LinkDrawn": showLinkLabel,  // this DiagramEvent listener is defined below
+                "LinkRelinked": showLinkLabel,
+                "animationManager.duration": 800, // slightly longer than default (600ms) animation
+                model: new go.GraphLinksModel(
+                    {
+                        linkKeyProperty: 'key'  // IMPORTANT! must be defined for merges and data sync when using GraphLinksModel
+                    }
+                )
+            }
+        );
+
     function initDiagram() {
-        return generateDiagramStructure();
+        return generateDiagramStructure(diagram);
+    }
+
+    const generatePaletteComponent = () => {
+        return generatePalette(diagram)
     }
 
     function handleModelChange(changes: any) {
@@ -57,28 +81,27 @@ export const DrawPetriModal = ({displayBasic, setDisplayBasic}: DrawPetriModalPr
         setNodesDiagram({...nodesDiagram, nodes: nodes})
     }
 
-
-    const renderFooter = (name: string) => {
+    const renderFooter = () => {
         return (
             <div>
-                <Button label="No" icon="pi pi-times" onClick={() => onHide(name)} className="p-button-text"/>
-                <Button label="Guardar" icon="pi pi-check" onClick={() => onHide(name)} autoFocus/>
+                <Button label="No" icon="pi pi-times" onClick={() => onHide()} className="p-button-text"/>
+                <Button label="Guardar" icon="pi pi-check" onClick={() => onHide()} autoFocus/>
             </div>
         );
     }
     return (
         <Dialog visible={displayBasic} header="Dibujar red de petri" style={{width: '70vw', height: '80vh'}}
-                footer={renderFooter('displayBasic')}
-                onHide={() => onHide('displayBasic')}>
+                footer={renderFooter()}
+                onHide={() => onHide()}>
             <div className="flex flex-column xl:flex xl:flex-row gap-4 w-full">
                 <ScrollPanel style={{height: '62vh'}}>
                     <div className="flex-column flex align-items-center pl-2">
                         <h4>Herramientas </h4>
                         <ReactPalette
-                            initPalette={generatePalette}
+                            initPalette={generatePaletteComponent}
                             divClassName='palette-component w-10rem h-20rem'
-                            style={{ backgroundColor: '#eee' }}
-                            nodeDataArray={[{ key: 0, text: 'Alpha' }]}
+                            style={{backgroundColor: '#eee'}}
+                            nodeDataArray={[{key: 0, text: 'Alpha'}]}
                         />
                         {/*<div className="w-full flex flex-column align-items-center justify-content-center gap-3 pl-0">
                             <Button icon="pi pi-circle" onClick={updateNodesDiagram}
