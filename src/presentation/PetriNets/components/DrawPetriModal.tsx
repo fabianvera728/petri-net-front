@@ -4,8 +4,9 @@ import {TabPanel, TabView} from "primereact/tabview";
 import {ScrollPanel} from "primereact/scrollpanel";
 import {useState} from "react";
 import {ReactDiagram, ReactPalette} from "gojs-react";
-import {generateDiagramStructure, generatePalette, showLinkLabel} from "./GenerateDiagramStructure";
+import {generateDiagramStructure, generatePalette, showLinkLabel} from "../../../application/services/GenerateDiagramStructure";
 import * as go from "gojs";
+import {Place, Transition} from "../../../core/interfaces/Petri";
 
 interface DrawPetriModalProps {
     displayBasic: boolean
@@ -20,22 +21,23 @@ export const DrawPetriModal = ({displayBasic, setDisplayBasic}: DrawPetriModalPr
         setDisplayBasic(false)
     }
 
-    const [nodesDiagram, setNodesDiagram] = useState({
-            nodes: [
-                {key: 0, text: 'Alpha', color: 'lightblue', loc: '0 0'},
-                {key: 1, text: 'Beta', color: 'orange', loc: '150 0'},
-                {key: 2, text: 'Gamma', color: 'lightgreen', loc: '0 150'},
-                {key: 3, text: 'Delta', color: 'pink', loc: '150 150'}
-            ],
-            relations: [
-                {key: -1, from: 0, to: 1},
-                {key: -2, from: 0, to: 2},
-                {key: -3, from: 1, to: 1},
-                {key: -4, from: 2, to: 3},
-                {key: -5, from: 3, to: 0}
-            ]
+    const [nodesDiagram, setNodesDiagram] = useState<any>({
+            nodes: [],
+            relations: []
         }
     )
+
+    function isLinkValid(fromnode: go.Node, fromport: any, tonode: go.Node, toport: go.Node) {
+        const initialNodeCategory = diagram.model.getCategoryForNodeData(fromnode.data)
+        const finalNodeCategory = diagram.model.getCategoryForNodeData(tonode.data)
+        if (initialNodeCategory === 'Place') {
+            return finalNodeCategory === 'Transition'
+        } else if (initialNodeCategory === 'Transition') {
+            return finalNodeCategory === 'Place'
+        } else {
+            return false
+        }
+    }
 
     const $ = go.GraphObject.make;
     const diagram =
@@ -47,6 +49,8 @@ export const DrawPetriModal = ({displayBasic, setDisplayBasic}: DrawPetriModalPr
                 // 'undoManager.maxHistoryLength': 0,  // uncomment disable undo/redo functionality
                 "LinkDrawn": showLinkLabel,  // this DiagramEvent listener is defined below
                 "LinkRelinked": showLinkLabel,
+                "linkingTool.linkValidation": isLinkValid,
+                "relinkingTool.linkValidation": isLinkValid,
                 "animationManager.duration": 800, // slightly longer than default (600ms) animation
                 model: new go.GraphLinksModel(
                     {
@@ -64,21 +68,50 @@ export const DrawPetriModal = ({displayBasic, setDisplayBasic}: DrawPetriModalPr
         return generatePalette(diagram)
     }
 
-    function handleModelChange(changes: any) {
-        console.log(changes)
-        console.log(modelData)
-        /*
-            alert('GoJS model changed!');
-        */
+    function mapperNodeToPlace(node: go.Node) : Place {
+        return {
+            name: node.data.text1,
+            tokens: parseInt(node.data.text2),
+            key: node.key,
+            outputs: []
+        };
     }
 
-    const [modelData, setModelData] = useState<any>(initDiagram)
+    function mapperNodeToTransition(node: go.Node) : Transition {
+        return {
+            name: node.data.text,
+            key: node.key,
+            outputs: []
+        };
+    }
 
-    const updateNodesDiagram = () => {
-        console.log(nodesDiagram)
-        const nodes = nodesDiagram.nodes
-        nodes.push({key: 1, text: 'Beta', color: 'orange', loc: '150 0'})
-        setNodesDiagram({...nodesDiagram, nodes: nodes})
+    function handleModelChange(changes: any) {
+        let currentPlaces: Place[] = []
+        let currentTransitions: Transition[] = []
+        diagram.nodes.each((node) => {
+            if (node.data.category === 'Place') {
+                currentPlaces.push(mapperNodeToPlace(node))
+            } else {
+                currentTransitions.push(mapperNodeToTransition(node))
+            }
+        })
+        diagram.links.each((link) => {
+            const nodeFrom = diagram.nodes.filter((node) => node.key === link.data.from).first()
+            const nodeTo = diagram.nodes.filter((node) => node.key === link.data.to).first()
+            if (nodeFrom!.data.category === 'Place') {
+                currentPlaces.forEach((place) => {
+                    if(place.key === link.data.from){
+                        place.outputs!.push(nodeTo!.data.key)
+                    }
+                })
+            } else {
+                currentTransitions.forEach((transition) => {
+                    if(transition.key === link.data.from){
+                        transition.outputs!.push(nodeTo!.data.key)
+                    }
+                })
+            }
+        })
     }
 
     const renderFooter = () => {
@@ -90,7 +123,7 @@ export const DrawPetriModal = ({displayBasic, setDisplayBasic}: DrawPetriModalPr
         );
     }
     return (
-        <Dialog visible={displayBasic} header="Dibujar red de petri" style={{width: '70vw', height: '80vh'}}
+        <Dialog visible={displayBasic} header="Dibujar red de petri" style={{width: '70vw', height: '90%'}}
                 footer={renderFooter()}
                 onHide={() => onHide()}>
             <div className="flex flex-column xl:flex xl:flex-row gap-4 w-full">
@@ -99,23 +132,12 @@ export const DrawPetriModal = ({displayBasic, setDisplayBasic}: DrawPetriModalPr
                         <h4>Herramientas </h4>
                         <ReactPalette
                             initPalette={generatePaletteComponent}
-                            divClassName='palette-component w-10rem h-20rem'
-                            style={{backgroundColor: '#eee'}}
-                            nodeDataArray={[{key: 0, text: 'Alpha'}]}
+                            divClassName='palette-component w-7rem h-20rem'
+                            nodeDataArray={[
+                                {category: 'Place', text1: 'Place', text2: '0'},
+                                {category: 'Transition', text: 'Transition'}
+                            ]}
                         />
-                        {/*<div className="w-full flex flex-column align-items-center justify-content-center gap-3 pl-0">
-                            <Button icon="pi pi-circle" onClick={updateNodesDiagram}
-                                    className="p-button-rounded p-button-secondary p-button-outlined"
-                                    aria-label="Places"/>
-                            <Button icon="pi pi-pause" className="p-button-rounded p-button-secondary p-button-outlined"
-                                    aria-label="Transitions"/>
-                            <Button icon="pi pi-arrow-right"
-                                    className="p-button-rounded p-button-secondary p-button-outlined"
-                                    aria-label="Arco"/>
-                            <Button icon="pi pi-stop-circle"
-                                    className="p-button-rounded p-button-secondary p-button-outlined"
-                                    aria-label="Arco"/>
-                        </div>*/}
                     </div>
                 </ScrollPanel>
                 <div className="border-left-2 border-gray-300 w-full">
@@ -125,17 +147,17 @@ export const DrawPetriModal = ({displayBasic, setDisplayBasic}: DrawPetriModalPr
                                 <ReactDiagram
                                     initDiagram={initDiagram}
                                     divClassName="w-full h-full border-0 border-white"
-                                    nodeDataArray={nodesDiagram.nodes}
-                                    linkDataArray={nodesDiagram.relations}
+                                    nodeDataArray={[]}
+                                    linkDataArray={[]}
                                     onModelChange={handleModelChange}
                                 />
                             </ScrollPanel>
                         </TabPanel>
                         <TabPanel header="JSON">
                             <ScrollPanel style={{width: '35vw', height: '50vh'}}>
-                                <div>
-                                    {/*<pre>{JSON.stringify({petriData, inputs: inputs}, null, 4)}</pre>*/}
-                                </div>
+                                {/*<div>
+                                    <pre>{JSON.stringify(petriNet, null, 4)}</pre>
+                                </div>*/}
                             </ScrollPanel>
                         </TabPanel>
                     </TabView>

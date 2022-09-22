@@ -1,25 +1,12 @@
-export interface Petri{
-    name: string,
-    description: string,
-    places: Place[],
-    tokens: Token[],
-    inputs: Input[],
-    transitions: Transition[]
-}
-
-export interface Input{
-    transition: Transition,
-    places: Place[]
-}
-
 export interface Place{
-    name: string
-}
-
-export interface Token{
-    name: string
+    key?: string | number
+    name: string,
+    tokens: number,
+    outputs?: any[]
 }
 
 export interface Transition{
-    name: string
+    name: string,
+    key?: string | number
+    outputs?: any[]
 }
