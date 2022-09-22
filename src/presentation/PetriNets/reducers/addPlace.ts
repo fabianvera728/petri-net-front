@@ -8,6 +8,6 @@ export function addPlace(state: PetriNet, action: { type: string; payload: Place
             ...state.places.map((place) => place),
             action.payload
         ],
-        placesHash: {...state.placesHash, [action.payload.id]: action.payload}
+        placesHash: {...state.placesHash, [action.payload.id]: {...action.payload}}
     }
 }

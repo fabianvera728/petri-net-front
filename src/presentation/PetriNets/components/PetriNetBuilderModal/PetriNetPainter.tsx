@@ -1,7 +1,7 @@
 import {TabPanel, TabView} from "primereact/tabview";
 import {ScrollPanel} from "primereact/scrollpanel";
 import {Graphviz} from "graphviz-react";
-import {useContext, useState} from "react";
+import {useContext} from "react";
 import PetriNetContext from "../../context/PetriNetContext";
 import {GeneratePetriNetGraph} from "../../../../application/usecases/GeneratePetriNetGraph";
 import {useInjection} from "inversify-react";
@@ -17,7 +17,7 @@ const PetriNetPainter = () => {
                         petriNet && (
                             <ScrollPanel className="p-0" style={{width: '20vw', height: '40vh'}}>
                                 <Graphviz dot={generatePetriNet.execute(petriNet)}
-                                          options={{zoom: true, height: 350, width: 350, fit: true}}/>
+                                          options={{zoom: true, height: 350, width: 350, fit: true, useWorker: false}}/>
                             </ScrollPanel>
                         )
                     }

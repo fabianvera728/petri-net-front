@@ -21,11 +21,11 @@ export class GeneratePetriNetGraph {
         return this.petriNetVisualization.generatePetriNetGraph(petriNet)
     }
 
-    public mapperInputsToDigraph(places: { [key: string]: Place }, transitions: { [key: string]: Transition }, inputs: Input[]) {
+    public mapperInputsToDigraph(petriNet: PetriNet, inputs: Input[]) {
         let inputsAsString = ''
         inputs.forEach((input) => {
-            const placeName = places[input.place].name
-            const transitionName = transitions[input.transition].name
+            const placeName = this.getPlaceName(petriNet, input.place)
+            const transitionName = this.getTransitionName(petriNet, input.transition)
             if (placeName !== '' && transitionName !== '') {
                 inputsAsString += `${placeName}->${transitionName}; `.repeat(input.number_of_inputs)
             }
@@ -33,11 +33,19 @@ export class GeneratePetriNetGraph {
         return inputsAsString
     }
 
-    public mapperOutputsToDigraph(places: { [key: string]: Place }, transitions: { [key: string]: Transition }, outputs: Output[]) {
+    public getPlaceName(petriNet: PetriNet, placeId: string){
+        return petriNet.places.filter((place) => place.id === placeId)[0].name
+    }
+
+    public getTransitionName(petriNet: PetriNet, transitionId: string){
+        return petriNet.transitions.filter((transition) => transition.id === transitionId)[0].name
+    }
+
+    public mapperOutputsToDigraph(petriNet: PetriNet, outputs: Output[]) {
         let outputsAsString = ''
         outputs.forEach((output) => {
-            const placeName = places[output.place].name
-            const transitionName = transitions[output.transition].name
+            const placeName = this.getPlaceName(petriNet, output.place)
+            const transitionName = this.getTransitionName(petriNet, output.transition)
             if (placeName !== '' && transitionName !== '') {
                 outputsAsString += `${transitionName}->${placeName}; `.repeat(output.number_of_outputs)
             }
@@ -72,8 +80,8 @@ export class GeneratePetriNetGraph {
                 node [shape=rect,height=0.4,width=.4,style=filled];
                 ${this.mapperTransitionsDigraph(petriNet.transitions)}
             }
-            ${this.mapperInputsToDigraph(petriNet.placesHash, petriNet.transitionsHash, petriNet.inputs)}
-            ${this.mapperOutputsToDigraph(petriNet.placesHash, petriNet.transitionsHash, petriNet.outputs)}
+            ${this.mapperInputsToDigraph(petriNet, petriNet.inputs)}
+            ${this.mapperOutputsToDigraph(petriNet, petriNet.outputs)}
         }`
     }
 

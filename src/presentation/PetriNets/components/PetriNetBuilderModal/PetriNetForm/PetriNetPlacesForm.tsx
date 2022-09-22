@@ -18,6 +18,13 @@ export const PetriNetPlacesForm = () => {
     }
 
     const onChangePlace = (event: ChangeEvent<HTMLInputElement>) => {
+        if(event.target.id === 'tokens'){
+            try{
+                parseInt(event.target.value)
+            } catch (e) {
+                return
+            }
+        }
         setPlaceData({
             ...placeData,
             [event.target.id]: event.target.id === 'tokens' ? parseInt(event.target.value) : event.target.value
@@ -41,10 +48,10 @@ export const PetriNetPlacesForm = () => {
             </div>
             <div className="pt-4 grid gap-2 grid-nogutter ">
                 {
-                    petriNet!.places.map((place, index) =>
-                        <div key={`place${index}`} className="col">
+                    Object.values(petriNet?.placesHash || {}).map((place, index) => {
+                        return <div key={`place${index}`} className="col">
                             <div className="flex col flex-row border-round-xl pl-2
-                                bg-gray-200 justify-content-between align-items-center">
+                        bg-gray-200 justify-content-between align-items-center">
                                 <h5 className="pl-1 w-full">{place.name}</h5>
                                 <span className="pl-3 w-3rem pr-2">{place.tokens}</span>
                                 <Button onClick={() => removePlaceClicked(index)} icon="pi pi-pencil" tooltip="Editar"
@@ -53,7 +60,7 @@ export const PetriNetPlacesForm = () => {
                                         className="p-buttom-sm w-3rem p-button-text text-red-700 p-button-icon-only"/>
                             </div>
                         </div>
-                    )
+                    })
                 }
             </div>
         </div>

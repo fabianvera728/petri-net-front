@@ -14,14 +14,16 @@ export const PetriCard = ({showModalSimulation, petriNet, graph}: PetriNetCardPr
     const header = () => {
         return (
             <Graphviz className="bg-gray-50 border-round-2xl border-gray-500 p-2" dot={graph}
-                      options={{width: 340, height: 200}}/>
+                      options={{width: 340, height: 200, useWorker: false}}/>
         );
     };
 
     const footer = (
         <span>
-            <Button tooltip="Simular" icon="pi pi-play" onClick={() => showModalSimulation(petriNet)} className="p-button-sm"/>
-            <Button tooltip="Borrar" icon="pi pi-trash" onClick={() => showModalSimulation(petriNet)} className="p-button-danger ml-2 p-button-sm"/>
+            <Button tooltip="Simular" icon="pi pi-play" onClick={() => showModalSimulation(petriNet)}
+                    className="p-button-sm"/>
+            <Button tooltip="Borrar" icon="pi pi-trash" onClick={() => showModalSimulation(petriNet)}
+                    className="p-button-danger ml-2 p-button-sm"/>
         </span>
     );
 

@@ -49,7 +49,7 @@ export const PetriModalSimulation = ({displayBasic, setDisplayBasic, petriNet}: 
         return (
             <Graphviz className="bg-gray-50 border-round-2xl border-gray-500 p-2"
                       dot={generatePetriNetGraph.execute(pnetNet)}
-                      options={{width: 400, height: 270, zoom: true}}/>
+                      options={{width: 400, height: 270, zoom: true, useWorker: false}}/>
         );
     };
 
@@ -89,12 +89,10 @@ export const PetriModalSimulation = ({displayBasic, setDisplayBasic, petriNet}: 
 /*
             setHistory([...history, Object.assign({},{...petriNet})])
 */
-/*
             console.log("ejecutando el efect")
-*/
             getTransitionsEnabled(history[0])
+            console.log(history[0])
         /*}*/
-        console.log("ejecutando el efect")
     }, [])
 
     return (

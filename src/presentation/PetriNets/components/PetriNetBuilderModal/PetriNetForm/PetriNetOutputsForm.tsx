@@ -35,14 +35,14 @@ const PetriNetOutputsForm = () => {
             <div className="flex justify-content-between align-items-center">
                 <div className="flex flex-row gap-2">
                     <Dropdown className="w-full"
-                              options={petriNet!.transitions}
+                              options={Object.values(petriNet?.transitions || {}).map((transition) => transition)}
                               value={outputData.transition}
                               id="transition"
                               onChange={(e) => onChangeOutputPlace(e)}
                               optionValue="id"
                               optionLabel="name" placeholder="Selecionar transicion"/>
                     <Dropdown className="w-full"
-                              options={petriNet!.places}
+                              options={Object.values(petriNet?.placesHash || {}).map((place) => place)}
                               onChange={(e) => onChangeOutputPlace(e)}
                               optionValue="id"
                               id="place"

@@ -8,7 +8,7 @@ export function addTransition(state: PetriNet, action: { type: string; payload: 
             ...state.transitions.map((transition) => transition),
             action.payload
         ],
-        transitionsHash: {...state.transitionsHash, [action.payload.id]: action.payload}
+        transitionsHash: {...state.transitionsHash, [action.payload.id]: {...action.payload}}
     };
 }
 

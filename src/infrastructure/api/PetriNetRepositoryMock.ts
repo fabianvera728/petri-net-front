@@ -2,8 +2,9 @@ import PetriNetRepository from "../../domain/repositories/PetriNetRepository";
 import {Transition} from "../../domain/models/Transition";
 import {PetriNet} from "../../domain/models/PetriNet";
 import {injectable} from "inversify";
+import {dataMockPetries} from "./DataMockPetries";
 
-let petriNets: PetriNet[] = []
+let petriNets: PetriNet[] = dataMockPetries()
 
 @injectable()
 export default class PetriNetRepositoryMock implements PetriNetRepository {
@@ -27,8 +28,11 @@ export default class PetriNetRepositoryMock implements PetriNetRepository {
         petriNet.transitions.forEach((transition) => {
             let result = true
             petriNet.inputs.forEach((input) => {
-                if(input.transition === transition.id){
+                if (input.transition === transition.id) {
+
+/*
                     result = result && petriNet.placesHash[input.place].tokens >= input.number_of_inputs
+*/
                 }
             })
             if (result) {
@@ -39,12 +43,11 @@ export default class PetriNetRepositoryMock implements PetriNetRepository {
     }
 
     list(): Promise<PetriNet[]> {
-        console.log("Reading.....")
         return Promise.resolve(Object.values(petriNets));
     }
 
     save(petriNet: PetriNet): Promise<PetriNet> {
-        petriNets.push(petriNet)
+        petriNets.push({...petriNet})
         return Promise.resolve(petriNet)
     }
 
