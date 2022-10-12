@@ -25,7 +25,7 @@ const Root = () => {
             style={{gap: "30%"}}
             className="flex w-full z-5 sticky top-0 flex-row align-content-center justify-content-center bg-gray-100 py-2">
             <div className="flex gap-3 align-items-center">
-                <img width={"50rem"} height={"50rem"} src="assets/img.webp" alt="Logo Petri Net"/>
+                <img width={"50rem"} height={"50rem"} src="public/assets/img.webp" alt="Logo Petri Net"/>
             </div>
             <div className="flex flex-row gap-2 align-items-center">
                 <NavLink to={""} style={{textDecoration: "none"}}>
