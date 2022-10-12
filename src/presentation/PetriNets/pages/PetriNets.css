@@ -1,0 +1,14 @@
+.petri-net-list__placecontent_center {
+    place-content: center;
+}
+
+
+.animation__emoji{
+    position: absolute;
+    z-index: -1;
+    overflow: hidden;
+}
+
+@keyframes animation_emoji_e {
+
+}

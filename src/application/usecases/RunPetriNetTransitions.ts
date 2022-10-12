@@ -11,7 +11,7 @@ export default class RunPetriNetTransitions {
         this.petriNetRepositoty = petriNetRepository
     }
 
-    public async execute(petriNet: PetriNet, transitionId: string) {
+    public async execute(petriNet: PetriNet, transitionId: string[]) {
         return this.petriNetRepositoty.fireTransitions(petriNet, transitionId)
     }
 

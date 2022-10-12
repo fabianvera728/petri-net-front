@@ -9,16 +9,16 @@ import * as go from "gojs";
 import {Place, Transition} from "../../../core/interfaces/Petri";
 
 interface DrawPetriModalProps {
-    displayBasic: boolean
-    setDisplayBasic: any
+    isVisible: boolean
+    toggleModalState: any
 }
 
-export const DrawPetriModal = ({displayBasic, setDisplayBasic}: DrawPetriModalProps) => {
+export const DrawPetriModal = ({isVisible, toggleModalState}: DrawPetriModalProps) => {
 
     const [activeIndex, setActiveIndex] = useState(0);
 
     const onHide = () => {
-        setDisplayBasic(false)
+        toggleModalState(false)
     }
 
     const [nodesDiagram, setNodesDiagram] = useState<any>({
@@ -123,7 +123,7 @@ export const DrawPetriModal = ({displayBasic, setDisplayBasic}: DrawPetriModalPr
         );
     }
     return (
-        <Dialog visible={displayBasic} header="Dibujar red de petri" style={{width: '70vw', height: '90%'}}
+        <Dialog visible={isVisible} header="Dibujar red de petri" style={{width: '70vw', height: '90%'}}
                 footer={renderFooter()}
                 onHide={() => onHide()}>
             <div className="flex flex-column xl:flex xl:flex-row gap-4 w-full">
@@ -151,13 +151,6 @@ export const DrawPetriModal = ({displayBasic, setDisplayBasic}: DrawPetriModalPr
                                     linkDataArray={[]}
                                     onModelChange={handleModelChange}
                                 />
-                            </ScrollPanel>
-                        </TabPanel>
-                        <TabPanel header="JSON">
-                            <ScrollPanel style={{width: '35vw', height: '50vh'}}>
-                                {/*<div>
-                                    <pre>{JSON.stringify(petriNet, null, 4)}</pre>
-                                </div>*/}
                             </ScrollPanel>
                         </TabPanel>
                     </TabView>

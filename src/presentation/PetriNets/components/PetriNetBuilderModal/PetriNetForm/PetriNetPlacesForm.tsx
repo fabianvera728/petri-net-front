@@ -18,8 +18,8 @@ export const PetriNetPlacesForm = () => {
     }
 
     const onChangePlace = (event: ChangeEvent<HTMLInputElement>) => {
-        if(event.target.id === 'tokens'){
-            try{
+        if (event.target.id === 'tokens') {
+            try {
                 parseInt(event.target.value)
             } catch (e) {
                 return

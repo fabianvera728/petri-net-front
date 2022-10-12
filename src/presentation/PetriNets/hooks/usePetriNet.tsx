@@ -1,8 +1,18 @@
 import {useReducer} from "react";
-import {actions, reducer} from "../reducers/petriNetReducer";
+import {reducer} from "../reducers/petriNetReducer";
 import {PetriNet} from "../../../domain/models/PetriNet";
+import {actions} from "../actions";
 
-const initialState = new PetriNet()
+export const initialState: PetriNet = {
+    name: '',
+    description: '',
+    places: [],
+    transitions: [],
+    inputs: [],
+    outputs: [],
+    placesHash: {},
+    transitionsHash: {},
+}
 
 const usePetriNet = () => {
     const [petriNet, dispatch] = useReducer(reducer, initialState);
@@ -15,7 +25,8 @@ const usePetriNet = () => {
         addInput,
         addOutput,
         removeInput,
-        removeOutput
+        removeOutput,
+        reset,
     } = actions(dispatch)
 
     return {
@@ -27,7 +38,8 @@ const usePetriNet = () => {
         addInput,
         addOutput,
         removeInput,
-        removeOutput
+        removeOutput,
+        reset
     }
 
 }

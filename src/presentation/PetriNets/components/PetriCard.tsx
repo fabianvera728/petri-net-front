@@ -1,38 +1,35 @@
 import {Button} from "primereact/button";
-import {Card} from "primereact/card";
 import {PetriNet} from "../../../domain/models/PetriNet";
-import {Graphviz} from "graphviz-react";
+import {useState} from "react";
 
 interface PetriNetCardProps {
     showModalSimulation: (petriNet: PetriNet) => void
-    petriNet: PetriNet;
+    readonly petriNet: PetriNet;
     graph: string
 }
 
-export const PetriCard = ({showModalSimulation, petriNet, graph}: PetriNetCardProps) => {
+export const PetriCard = ({showModalSimulation, petriNet}: PetriNetCardProps) => {
 
-    const header = () => {
-        return (
-            <Graphviz className="bg-gray-50 border-round-2xl border-gray-500 p-2" dot={graph}
-                      options={{width: 340, height: 200, useWorker: false}}/>
-        );
-    };
+    const [, setIsVisibleDeleteDialog] = useState(false)
 
-    const footer = (
-        <span>
-            <Button tooltip="Simular" icon="pi pi-play" onClick={() => showModalSimulation(petriNet)}
-                    className="p-button-sm"/>
-            <Button tooltip="Borrar" icon="pi pi-trash" onClick={() => showModalSimulation(petriNet)}
-                    className="p-button-danger ml-2 p-button-sm"/>
-        </span>
-    );
+    /*function random_item()
+    {
+        let items = ['#F79326', '#FFDE59', '#9976FF', '#CA9CCB'];
+        return items[Math.floor(Math.random()*items.length)];
+    }*/
 
     return (
         <div>
-            <Card title="Prueba 1 petri" subTitle="Lorem ipsum dolor sit amet, consectetur adipisicing elit. Inventore sed consequuntur error repudiandae numquam deserunt
-                    quisquam repellat libero asperiores earum nam nobis, culpa ratione quam perferendis esse, cupiditate neque quas!"
-                  style={{width: '22em'}} footer={footer} header={header}>
-            </Card>
+            <img width={"50rem"} height={"30rem"} src={"assets/img_4.png"} alt={"Preview red de petri"}/>
+
+            <div>
+                <Button aria-label={"run transition"} tooltip="Simular" icon="pi pi-play"
+                        onClick={() => showModalSimulation(petriNet)}
+                        className="p-button-sm" style={{backgroundColor: '#3237ff87', color: "#ffffff"}}/>
+                <Button aria-label={"delete transition"} tooltip="Borrar" icon="pi pi-trash"
+                        onClick={() => setIsVisibleDeleteDialog(true)}
+                        className="ml-2 p-button-sm" style={{backgroundColor: '#4361ee21'}}/>
+            </div>
         </div>
     )
 }

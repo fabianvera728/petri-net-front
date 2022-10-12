@@ -3,39 +3,15 @@ import {Transition} from "./Transition";
 import {Input} from "./Input";
 import {Output} from "./Output";
 
-export class PetriNet {
-    public name: string
-    public description: string
-    public places: Place[]
-    public transitions: Transition[]
-    public inputs: Input[]
-    public outputs: Output[]
-    public placesHash : {[key: string]: Place}
-    public transitionsHash : {[key: string]: Transition}
+export interface PetriNet {
 
-    constructor(/*{
-                    name
-                    description
-                    places
-                    transitions
-                    inputs=[]
-                    outputs=[]
-                }:{
-        name
-        description
-        places?
-        transitions?
-        inputs?
-        outputs?
-    }*/) {
-        this.name = ''
-        this.description = ''
-        this.places = []
-        this.transitions = []
-        this.inputs = []
-        this.outputs = []
-        this.placesHash = {}
-        this.transitionsHash = {}
-    }
+    readonly name: string
+    readonly description: string
+    readonly places: Place[]
+    readonly transitions: Transition[]
+    readonly inputs: Input[]
+    readonly outputs: Output[]
+    readonly placesHash : {[key: string]: Place}
+    readonly transitionsHash : {[key: string]: Transition}
 
 }

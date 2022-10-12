@@ -9,23 +9,32 @@ import CreatePetriNet from "../../../../application/usecases/CreatePetriNet";
 import usePetriNet from "../../hooks/usePetriNet";
 
 interface PetriNetBuilderModalProps {
-    displayBasic: boolean,
-    setDisplayBasic: () => void
+    isVisible: boolean,
+    toggleModalState: () => void
 }
 
 export const PetriNetBuilderModal = (
     {
-        displayBasic,
-        setDisplayBasic
+        isVisible,
+        toggleModalState
     }: PetriNetBuilderModalProps) => {
 
-    const {petriNet, addPlace, removePlace, addTransition, removeTransition, addInput, addOutput} = usePetriNet()
-    const onHide = () => {
-        setDisplayBasic()
-    }
-
+    const {
+        petriNet,
+        addPlace,
+        removePlace,
+        addTransition,
+        reset: resetPetriNet,
+        removeTransition,
+        addInput,
+        addOutput
+    } = usePetriNet()
     const toastTL = useRef<any>(null);
     const createPetriNetUseCase = useInjection<CreatePetriNet>(CreatePetriNet)
+
+    const onHide = () => {
+        toggleModalState()
+    }
 
     const onSave = () => {
         createPetriNetUseCase.execute(petriNet).then(
@@ -33,7 +42,8 @@ export const PetriNetBuilderModal = (
                 toastTL.current.show([
                     {severity: 'info', summary: 'Petri Net', detail: 'Petri Net fue creada', life: 5000},
                 ]);
-                setDisplayBasic()
+                resetPetriNet()
+                toggleModalState()
             },
             (error) => {
                 toastTL.current.show([
@@ -41,8 +51,8 @@ export const PetriNetBuilderModal = (
                 ]);
             }
         )
-
     }
+
     const renderFooter = FooterPetriModalCreator(onHide, onSave);
 
     return (
@@ -50,13 +60,13 @@ export const PetriNetBuilderModal = (
             petriNet: petriNet,
             addPlace, removePlace, addTransition, removeTransition, addInput, addOutput
         }}>
-            <Toast ref={toastTL} position="bottom-right" className="p-toast-message-icon"/>
-            <Dialog visible={displayBasic} header="Crear PETRI" style={{width: '70vw', height: '90%'}}
+            <Toast ref={toastTL} position="bottom-right" className="overflow-hidden p-toast-message-icon"/>
+            <Dialog visible={isVisible} header="Crear PETRI" className="overflow-hidden overflow-y-hidden"
+                    style={{width: '70vw', height: '90%'}}
                     footer={renderFooter}
                     onHide={() => onHide()}>
                 <div className="flex flex-column xl:flex xl:flex-row gap-4 w-full pb-0">
                     <PetriNetForm/>
-                    {/*<PetriNetPainter/>*/}
                 </div>
             </Dialog>
         </PetriNetContext.Provider>

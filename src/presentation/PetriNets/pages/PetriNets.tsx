@@ -1,6 +1,4 @@
-import {createContext, useEffect, useState} from "react";
-import {Navbar} from "../../shared/components/Navbar";
-import {TabPanel, TabView} from "primereact/tabview";
+import { Fragment, useEffect, useRef, useState} from "react";
 import {PetriCard} from "../components/PetriCard";
 import {DrawPetriModal} from "../components/DrawPetriModal";
 import {PetriModalSimulation} from "../components/PetriModalSimulation";
@@ -8,36 +6,50 @@ import {PetriNetBuilderModal} from "../components/PetriNetBuilderModal/PetriNetB
 import {useInjection} from "inversify-react";
 import ListPetriNetsUseCase from "../../../application/usecases/ListPetriNetsUseCase";
 import {PetriNet} from "../../../domain/models/PetriNet";
-import {Button} from "primereact/button";
 import {GeneratePetriNetGraph} from "../../../application/usecases/GeneratePetriNetGraph";
+import './PetriNets.css'
+import {Toast} from "primereact/toast";
+import {PetriNetEventLogModal} from "../components/PetriNetEventLogModal";
 
-export const StepsFirePetriNetContext = createContext<any>({})
-
-
-export const PetriNets = () => {
+const PetriNets = () => {
     const listPetriNet = useInjection<ListPetriNetsUseCase>(ListPetriNetsUseCase)
     const generatePetriNetGraph = useInjection<GeneratePetriNetGraph>(GeneratePetriNetGraph)
-
     const [modalCreatePetri, setModalCreatePetri] = useState(false)
+
     const [modalDrawPetri, setModalDrawPetri] = useState(false)
     const [modalPetriSimulation, setModalPetriSimulation] = useState(false)
+    const [modalEventLog, setModalEventLog] = useState(false)
     const [petriNetsSaved, setPetriNetsSaved] = useState<PetriNet[]>([])
-    const [petriNetSelected, setPetriNetSelected] = useState<PetriNet | null>(null)
-    const [history, setHistory] = useState<PetriNet[]>([])
+    const [petriNetSelected, setPetriNetSelected] = useState<PetriNet>()
 
     const showModalSimulation = (petriNetSelectedData: PetriNet) => {
-        setHistory([petriNetSelectedData])
-        setPetriNetSelected(petriNetSelectedData)
+        setPetriNetSelected({...petriNetSelectedData})
         setModalPetriSimulation(true)
     }
+    const notification = useRef<any>(null);
 
     const getPetriesData = () => {
         listPetriNet.execute().then(
             (petriNets) => {
-                setPetriNetsSaved(petriNets)
+                notification.current.show([
+                    {
+                        severity: 'info',
+                        summary: 'Petri Net',
+                        detail: 'Redes de petri cargadas',
+                        life: 3000
+                    },
+                ]);
+                setPetriNetsSaved([...petriNets])
             },
             (error) => {
-                console.log("Error no se pudo resolver la promesa: ", error)
+                notification.current.show([
+                    {
+                        severity: 'warn',
+                        summary: 'Petri Net',
+                        detail: 'No se pudieron cargar las redes de petri',
+                        life: 3000
+                    },
+                ]);
             }
         )
     }
@@ -47,60 +59,73 @@ export const PetriNets = () => {
         getPetriesData()
     }
 
+
     useEffect(() => {
-        if (history.length === 0) {
+        if (petriNetsSaved.length === 0) {
             getPetriesData();
         }
-        console.log("Ejecutando.......")
     }, [])
 
     return (
-        <StepsFirePetriNetContext.Provider value={{history, setHistory}}>
-            <div className="m-0 p-0">
-                <Navbar onClick={() => setModalCreatePetri(true)} onClick1={() => setModalDrawPetri(true)}/>
-                <div className="flex pt-6 flex-column align-items-center justify-center">
-                    <Button label="Actualizar" onClick={getPetriesData}/>
-                    <div style={{width: '60%'}}>
-                        <TabView>
-                            <TabPanel header="Recientes">
-                                <div className="grid gap-3 mb-6">
-                                    {
-                                        petriNetsSaved.slice(0, 5).map((petriNet, index) =>
-                                            <PetriCard key={`petri_card${index}`}
-                                                       petriNet={petriNet}
-                                                       graph={generatePetriNetGraph.execute(petriNet)}
-                                                       showModalSimulation={showModalSimulation}/>
-                                        )
-                                    }
-                                </div>
-                            </TabPanel>
-                            <TabPanel header="Disenos">
-                                <div className="grid gap-3 mb-6">
-                                    {
-                                        petriNetsSaved.map((petriNetValue, index) =>
-                                            <PetriCard key={`petri_card${index}`}
-                                                       petriNet={petriNetValue}
-                                                       graph={generatePetriNetGraph.execute(petriNetValue)}
-                                                       showModalSimulation={showModalSimulation}/>
-                                        )
-                                    }
-                                </div>
-                            </TabPanel>
-                        </TabView>
+        <Fragment>
+            <div style={{backgroundColor: '#ffcdb21c'}} className="pb-6">
+                <Toast ref={notification} position="bottom-right" className="overflow-hidden p-toast-message-icon"/>
+                <div className="m-0 p-0">
+                    <div className="flex pt-6 flex-column align-items-center justify-center pt-6">
+                        {/*<div className="animation__emoji"
+                             style={{position: "absolute", left: "1rem", zIndex: "1", rotate: "30deg"}}>
+                            <img src="src/assets/emoji_sunglasses.svg"/>
+                        </div>*/}
+                        {/*<div style={{
+                            position: "absolute",
+                            bottom: "4rem",
+                            zIndex: "1",
+                            right: "3rem",
+                            rotate: "30deg"
+                        }}>
+                            <img src="src/assets/stars.png"/>
+                        </div>*/}
+                        <div style={{width: '70%'}}>
+                            {/*<*TabView panelContainerStyle={{}}
+                                     style={{
+                                         borderTopLeftRadius: '1rem',
+                                         borderTopRightRadius: '1rem',
+                                         backgroundColor: '#4361ee21'
+                                     }} className="bg-white">
+                                <TabPanel header="Petri Nets">*/}
+
+                            <div className="grid gap-3 mb-6 petri-net-list__placecontent_center">
+                                {
+                                    petriNetsSaved.map((petriNet, index) =>
+                                        <PetriCard key={`petri_card${index}`}
+                                                   petriNet={{...petriNet}}
+                                                   graph={generatePetriNetGraph.execute(petriNet)}
+                                                   showModalSimulation={showModalSimulation}/>
+                                    )
+                                }
+                            </div>
+                            {/*</TabPanel>
+                                <TabPanel header="Event logs">
+                                    <Authors/>
+                                </TabPanel>
+                            </TabView>*/}
+                        </div>
+                    </div>
+                    <div>
+                        <PetriNetBuilderModal isVisible={modalCreatePetri}
+                                              toggleModalState={updatePetriNetsAfterCreatePetriNet}/>
+                        <DrawPetriModal isVisible={modalDrawPetri} toggleModalState={setModalDrawPetri}/>
+                        <PetriNetEventLogModal isVisible={modalEventLog} toggleModalState={setModalEventLog}/>
+                        {
+                            petriNetSelected && modalPetriSimulation &&
+                            <PetriModalSimulation petriNet={petriNetSelected} isVisible={modalPetriSimulation}
+                                                  toggleModalState={setModalPetriSimulation}/>
+                        }
                     </div>
                 </div>
-                <div>
-                    <PetriNetBuilderModal displayBasic={modalCreatePetri}
-                                          setDisplayBasic={updatePetriNetsAfterCreatePetriNet}/>
-                    <DrawPetriModal displayBasic={modalDrawPetri} setDisplayBasic={setModalDrawPetri}/>
-                    {
-                        petriNetSelected && modalPetriSimulation && history &&
-                        <PetriModalSimulation petriNet={petriNetSelected} displayBasic={modalPetriSimulation}
-                                              setDisplayBasic={setModalPetriSimulation}/>
-                    }
-
-                </div>
             </div>
-        </StepsFirePetriNetContext.Provider>
+        </Fragment>
     )
 }
+
+export default PetriNets;

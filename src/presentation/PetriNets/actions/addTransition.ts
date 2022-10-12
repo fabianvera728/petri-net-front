@@ -12,5 +12,3 @@ export function addTransition(state: PetriNet, action: { type: string; payload: 
     };
 }
 
-/*
-{state.transitionsHash.reduce(), [action.payload.id]: action.payload}*/
