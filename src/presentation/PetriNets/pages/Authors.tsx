@@ -8,13 +8,13 @@ export const Authors = () => {
                     Visitar pueblitos 📍, aprender 🧠, amante de los caballos 🐎</p>
             </div>
             <div>
-                <img width={"500rem"} height={"420rem"} src="src/assets/fabian_profile_author.webp"
+                <img width={"500rem"} height={"420rem"} src="assets/fabian_profile_author.webp"
                      alt="Fabian Vera - Author image"/>
             </div>
         </div>
         <div className="flex bg-white flex-row align-items-center justify-content-between w-full">
             <div className="flex">
-                <img width={"413rem"} height={"347rem"} src="src/assets/alejandro_author.webp"
+                <img width={"413rem"} height={"347rem"} src="assets/alejandro_author.webp"
                      alt="Alejandro Carrillo - Author image"/>
             </div>
             <div className="flex flex-column pr-8" style={{width: "70%"}}>
